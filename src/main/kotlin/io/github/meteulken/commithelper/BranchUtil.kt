@@ -50,7 +50,7 @@ object BranchUtil {
             if (content.isBlank()) return null
 
             if (content.startsWith("ref:", ignoreCase = true)) {
-                content.removePrefix("ref:").trim().removePrefix("refs/heads/").trim()
+                content.removePrefix("ref:").trim()
             } else {
                 content.take(7)
             }
@@ -80,20 +80,17 @@ object BranchUtil {
 
     fun extractBranchKey(name: String?): String? {
         if (name.isNullOrBlank()) return null
-        val clean = name.removePrefix("refs/heads/")
 
-        val match = ISSUE_REGEX.find(clean)
+        val match = ISSUE_REGEX.find(name)
         if (match != null) return match.value
 
-        if (clean.lowercase() in DEFAULT_BRANCHES) return clean
+        if (name.lowercase() in DEFAULT_BRANCHES) return name
 
         return null
     }
 
     fun normalizeBranch(name: String): String {
-        return extractBranchKey(name) ?: run {
-            val parts = name.split("/")
-            if (parts.isNotEmpty()) parts.last() else name
-        }
+        val clean = name.removePrefix("refs/heads/")
+        return extractBranchKey(clean) ?: clean
     }
 }

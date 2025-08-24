@@ -10,24 +10,24 @@ import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vcs.VcsDataKeys
 import com.intellij.openapi.vcs.ui.CommitMessage
 import io.github.meteulken.commithelper.provider.GeminiSpec
 import io.github.meteulken.commithelper.provider.MistralSpec
 
-private const val MAX_DIFF_CHARS = 10_000
+private const val MAX_DIFF_CHARS = 6_000
 
 class CommitAction : AnAction(), DumbAware {
 
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
-        val commitBox = e.getData(VcsDataKeys.COMMIT_MESSAGE_CONTROL) as? CommitMessage ?: return
+        val commitBox = e.getData(com.intellij.openapi.vcs.VcsDataKeys.COMMIT_MESSAGE_CONTROL) as? CommitMessage ?: return
 
         val settings = CommitPluginSettings.getInstance()
         val providerName = settings.provider
         val branch = BranchUtil.getCurrentBranch(project) ?: "no-branch"
 
-        val rawDiff = DiffUtil.getGitDiff(project)
+        val rawDiff = DiffUtil.collectSelectedDiffs(project)
+
         val diff = rawDiff.takeIf { it.isNotBlank() }?.let {
             if (it.length <= MAX_DIFF_CHARS) it else it.take(MAX_DIFF_CHARS) + "\n[...diff truncated...]"
         } ?: ""
@@ -57,7 +57,7 @@ class CommitAction : AnAction(), DumbAware {
                         else "Update files"
 
                     val fallbackMessage = if (settings.prependBranch) {
-                        BranchUtil.extractBranchKey(branch)?.let { "$it - $fallbackSubject" } ?: fallbackSubject
+                        BranchUtil.normalizeBranch(branch).let { "$it - $fallbackSubject" }
                     } else {
                         fallbackSubject
                     }
@@ -93,7 +93,7 @@ class CommitAction : AnAction(), DumbAware {
 
                 val subject = aiMessage.trim()
                 val commitMessage = if (settings.prependBranch) {
-                    BranchUtil.extractBranchKey(branch)?.let { "$it - $subject" } ?: subject
+                    BranchUtil.normalizeBranch(branch).let { "$it - $subject" }
                 } else {
                     subject
                 }

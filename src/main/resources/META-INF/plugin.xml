@@ -54,7 +54,7 @@
         <action id="CommitPlugin.Commit"
                 class="io.github.meteulken.commithelper.CommitAction"
                 text="Commit Helper"
-                description="Sets commit message using configured template/AI"
+                description="Generate AI-based commit message"
                 icon="icons/commitIcon.svg">
             <add-to-group group-id="Vcs.MessageActionGroup" anchor="last"/>
         </action>

@@ -22,18 +22,25 @@ object CommitCore {
             "^(feat|feature|fix|bugfix|hotfix|docs|refactor|perf|test|chore)/([^/]+)",
             RegexOption.IGNORE_CASE
         ).find(branch)
+
         if (m != null) {
             val typeRaw = m.groupValues[1]
             val type = when (typeRaw.lowercase(Locale.getDefault())) {
                 "feature" -> "feat"
                 else -> typeRaw.lowercase(Locale.getDefault())
             }
+
             val rawScope = m.groupValues[2]
-            val scope = rawScope.split('-', '_', '/')
-                .firstOrNull()
-                ?.takeIf { it.isNotBlank() }
+
+            val ISSUE_RE = Regex("^[A-Za-z]+-\\d+$")
+            val scope = rawScope
+                .takeIf { it.isNotBlank() && !ISSUE_RE.matches(it) }
+                ?.split('-', '_', '/')
+                ?.firstOrNull()
+
             return ParsedBranch(scope, type)
         }
+
         return ParsedBranch(null, null)
     }
 
@@ -46,7 +53,8 @@ object CommitCore {
             - If unsure, default type = ${typeHint ?: "feat"}.
         """.trimIndent()
         else """
-            Do NOT use Conventional Commit prefixes.
+            Do NOT use any Conventional Commit prefixes (feat:, fix:, etc.).
+            - Subject must be plain sentence only.
             - Subject ≤ $SUBJECT_LIMIT chars, imperative mood, no trailing period.
         """.trimIndent()
 
@@ -75,7 +83,6 @@ object CommitCore {
         }
 
     fun buildPrompt(
-        branch: String,
         language: String,
         diff: String,
         style: String,
@@ -83,13 +90,14 @@ object CommitCore {
         typeHint: String?
     ): String = """
         You write Git commit messages.
-        Branch: $branch
         ${buildLangInstr(language, diff)}
         ${buildStyleInstr(style, scope, typeHint)}
         Rules:
         - First line is the subject, single line only.
         - No code fences, quotes, or explanations.
-        - Do not repeat branch name.
+        - Do not include the branch name in the commit message.
+        - Analyze **all files and changes together**, and write a single summary that reflects the overall purpose of the commit.
+        - Do not generate separate commit messages per file.
 
         DIFF (truncated if long):
         ${trimmedDiff(diff)}

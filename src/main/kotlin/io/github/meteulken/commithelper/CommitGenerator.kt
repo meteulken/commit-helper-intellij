@@ -25,7 +25,15 @@ object CommitGenerator {
         if (apiKey.isBlank()) return "${provider.name} API key not set"
 
         val (scope, typeHint) = CommitCore.parseBranch(branch)
-        val prompt = CommitCore.buildPrompt(branch, language, diff, style, scope, typeHint)
+
+        val prompt = CommitCore.buildPrompt(
+            language = language,
+            diff = diff,
+            style = style,
+            scope = scope,
+            typeHint = typeHint
+        )
+
         val temperature = CommitCore.temperature(randomness)
 
         return try {
