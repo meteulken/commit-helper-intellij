@@ -1,0 +1,62 @@
+<idea-plugin>
+    <id>io.github.meteulken.commithelper</id>
+    <name>Commit Helper – AI Commit Message Generator</name>
+    <version>1.0.0</version>
+    <vendor email="mete.ulken71@gmail.com" url="https://github.com/meteulken">Mete Ulken</vendor>
+    <idea-version since-build="233"/>
+
+    <description><![CDATA[
+    <b>Commit Helper</b> – AI-powered commit message generator for JetBrains IDEs.<br><br>
+    <b>Features:</b>
+    <ul>
+      <li>Generate commit messages automatically with AI</li>
+      <li>Supports multiple providers: Gemini, Mistral AI (more coming soon)</li>
+      <li>Customizable commit style (e.g. normal, conventional)</li>
+      <li>Adjustable randomness (Stable vs. more creative output)</li>
+      <li>Multi-language support: English and Turkish</li>
+      <li>Optionally prepend branch issue ID to commit messages</li>
+      <li>Configure easily via <i>Settings → Tools → Commit Helper</i></li>
+      <li>Integrates into Commit window with one-click action</li>
+    </ul>
+
+    <b>Open Source:</b> MIT licensed.<br>
+    Includes an icon from the <i>Industrial Sharp UI Icons</i> collection (MIT, Siemens).<br>
+    Source code available on
+    <a href="https://github.com/meteulken/commit-helper-intellij">GitHub</a>.
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.vcs</depends>
+    <depends>Git4Idea</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService serviceImplementation="io.github.meteulken.commithelper.CommitPluginSettings"/>
+
+        <applicationConfigurable
+                id="commit-helper"
+                parentId="tools"
+                instance="io.github.meteulken.commithelper.CommitPluginConfigurable"
+                displayName="Commit Helper"/>
+
+        <notificationGroup id="Commit Helper"
+                           displayType="BALLOON"
+                           isLogByDefault="true"/>
+    </extensions>
+
+    <actions>
+        <action id="CommitPlugin.OpenSettings"
+                class="io.github.meteulken.commithelper.OpenSettingsAction"
+                text="Commit Helper Settings"
+                description="Open Commit Helper settings">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+
+        <action id="CommitPlugin.Commit"
+                class="io.github.meteulken.commithelper.CommitAction"
+                text="Commit Helper"
+                description="Sets commit message using configured template/AI"
+                icon="icons/commitIcon.svg">
+            <add-to-group group-id="Vcs.MessageActionGroup" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
