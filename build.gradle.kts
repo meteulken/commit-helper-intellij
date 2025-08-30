@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "io.github.meteulken"
-version = "1.0.0"
+version = "1.0.1"
 
 repositories {
     mavenCentral()

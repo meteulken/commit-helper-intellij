@@ -1,12 +1,12 @@
 <idea-plugin>
     <id>io.github.meteulken.commithelper</id>
-    <name>Commit Helper – AI Commit Message Generator</name>
-    <version>1.0.0</version>
+    <name>Commit Helper - AI Commit Message Generator</name>
+    <version>1.0.1</version>
     <vendor email="mete.ulken71@gmail.com" url="https://github.com/meteulken">Mete Ulken</vendor>
     <idea-version since-build="233"/>
 
     <description><![CDATA[
-    <b>Commit Helper</b> – AI-powered commit message generator for JetBrains IDEs.<br><br>
+    <b>Commit Helper</b> - AI-powered commit message generator for JetBrains IDEs.<br><br>
     <b>Features:</b>
     <ul>
       <li>Generate commit messages automatically with AI</li>
@@ -27,7 +27,7 @@
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.vcs</depends>
-    <depends>Git4Idea</depends>
+    <depends optional="true">Git4Idea</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="io.github.meteulken.commithelper.CommitPluginSettings"/>
