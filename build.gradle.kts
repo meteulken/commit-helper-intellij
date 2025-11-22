@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "io.github.meteulken"
-version = "1.0.1"
+version = "1.1.0"
 
 repositories {
     mavenCentral()
@@ -31,6 +31,15 @@ tasks {
     patchPluginXml {
         sinceBuild.set("233")
         untilBuild.set("")
+        changeNotes.set("""
+            <h3>v1.1.0</h3>
+            <ul>
+                <li><b>New:</b> Added support for <b>Ollama (Local)</b> AI provider.</li>
+                <li><b>New:</b> Added support for <b>11 languages</b> (English, Turkish, Spanish, German, French, Italian, Portuguese, Russian, Chinese, Japanese, Korean).</li>
+                <li><b>Improved:</b> Diff collection now accurately processes <b>only selected files</b> in the commit dialog.</li>
+                <li><b>Optimized:</b> Reduced prompt size for faster and more cost-effective generation.</li>
+            </ul>
+        """.trimIndent())
     }
 
     buildSearchableOptions {

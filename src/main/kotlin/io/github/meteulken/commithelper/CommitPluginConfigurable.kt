@@ -43,10 +43,14 @@ class CommitPluginConfigurable : Configurable {
             text = KeyStorage.loadMistral()
         }
 
-        providerBox = JComboBox(arrayOf("Gemini", "Mistral")).apply {
-            selectedItem = settings.provider.takeIf { it == "Gemini" || it == "Mistral" } ?: "Gemini"
-            prototypeDisplayValue = "Mistral"
+        providerBox = JComboBox(arrayOf("Gemini", "Mistral", "Ollama (Local)")).apply {
+            selectedItem = when (settings.provider) {
+                "Gemini", "Mistral", "Ollama (Local)" -> settings.provider
+                else -> "Gemini"
+            }
+            prototypeDisplayValue = "Ollama (Local)"
         }
+
         styleBox = JComboBox(arrayOf("normal", "conventional")).apply {
             selectedItem = settings.commitStyle
             prototypeDisplayValue = "conventional"
@@ -55,7 +59,10 @@ class CommitPluginConfigurable : Configurable {
             selectedItem = settings.commitRandomness
             prototypeDisplayValue = "Creative"
         }
-        languageBox = JComboBox(arrayOf("English", "Turkish")).apply {
+        languageBox = JComboBox(arrayOf(
+            "English", "Turkish", "Spanish", "German", "French",
+            "Italian", "Portuguese", "Russian", "Chinese", "Japanese", "Korean"
+        )).apply {
             selectedItem = settings.commitLanguage
             prototypeDisplayValue = "English"
         }
@@ -76,11 +83,22 @@ class CommitPluginConfigurable : Configurable {
             val p = providerBox.selectedItem as? String ?: "Gemini"
             val geminiOn = p == "Gemini"
             val mistralOn = p == "Mistral"
+            val localOn = p == "Ollama (Local)"
+
             setEnabledDeep(geminiRow, geminiOn)
             setEnabledDeep(geminiKeyField, geminiOn)
+
             setEnabledDeep(mistralRow, mistralOn)
             setEnabledDeep(mistralKeyField, mistralOn)
+
+            if (localOn) {
+                setEnabledDeep(geminiRow, false)
+                setEnabledDeep(geminiKeyField, false)
+                setEnabledDeep(mistralRow, false)
+                setEnabledDeep(mistralKeyField, false)
+            }
         }
+
         providerBox.addActionListener { refreshEnable() }
         refreshEnable()
 

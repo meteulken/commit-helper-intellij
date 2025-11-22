@@ -5,7 +5,7 @@ import java.util.Locale
 
 object CommitCore {
     const val SUBJECT_LIMIT = 72
-    const val MAX_DIFF = 6000
+    const val MAX_DIFF = 4000
 
     private val CONVENTIONAL_RE = Regex(
         "^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\\([^)]*\\))?:\\s+(.+)$",
@@ -64,16 +64,19 @@ object CommitCore {
         val hintInstr = if (isTr && hints.isNotBlank())
             "Somut isimleri özellikle an: $hints" else ""
 
-        return if (isTr) """
-        Write the message in Turkish.
-        - Kip: **edilgen geçmiş zaman** kullan (örn: eklendi, düzeltildi, güncellendi, kaldırıldı, yeniden adlandırıldı, taşındı).
-        - **Projeye özgü özel adları** (sınıf, dosya, fonksiyon, test, değişken, entity, domain terimleri) 
-          **aslıyla koru, Türkçeye çevirme.**
-        - Genel ifadelerden kaçın; mümkün olduğunda somut dosya/sınıf/test adlarını belirt.
-        - "Modeller eklendi", "Değişiklikler yapıldı" gibi belirsiz kalıpları kullanma.
-        $hintInstr
-    """.trimIndent()
-        else "Write the message in English."
+        if (isTr) {
+            return """
+                Write the message in Turkish.
+                - Kip: **edilgen geçmiş zaman** kullan (örn: eklendi, düzeltildi, güncellendi, kaldırıldı, yeniden adlandırıldı, taşındı).
+                - **Projeye özgü özel adları** (sınıf, dosya, fonksiyon, test, değişken, entity, domain terimleri) 
+                  **aslıyla koru, Türkçeye çevirme.**
+                - Genel ifadelerden kaçın; mümkün olduğunda somut dosya/sınıf/test adlarını belirt.
+                - "Modeller eklendi", "Değişiklikler yapıldı" gibi belirsiz kalıpları kullanma.
+                $hintInstr
+            """.trimIndent()
+        }
+
+        return "Write the message in $language."
     }
 
     fun trimmedDiff(diff: String): String =
@@ -88,20 +91,24 @@ object CommitCore {
         style: String,
         scope: String?,
         typeHint: String?
-    ): String = """
+    ): String {
+        return """
         You write Git commit messages.
         ${buildLangInstr(language, diff)}
         ${buildStyleInstr(style, scope, typeHint)}
+        
+        Analyze **all files and changes together**, and write a single summary that reflects the overall purpose of the commit.
+        Do not generate separate commit messages per file.
+        First line is the subject, single line only.
+        
         Rules:
-        - First line is the subject, single line only.
         - No code fences, quotes, or explanations.
         - Do not include the branch name in the commit message.
-        - Analyze **all files and changes together**, and write a single summary that reflects the overall purpose of the commit.
-        - Do not generate separate commit messages per file.
 
         DIFF (truncated if long):
         ${trimmedDiff(diff)}
     """.trimIndent()
+    }
 
     fun postProcess(raw: String, conventional: Boolean, scope: String?, typeHint: String?): String {
         var s = raw.trim()

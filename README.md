@@ -7,6 +7,9 @@ Generate clear, consistent commit messages with one click — following your tea
 
 ## ✨ Features
 - One-click commit message generation in the Commit toolwindow  
+- **Multi-Provider Support:** Gemini, Mistral, and **Ollama (Local)**
+- **Multi-Language Support:** 11 languages including English, Turkish, Spanish, German, etc.
+- **Smart Diff:** Accurately processes only selected files in the commit dialog
 - Hybrid approach: custom template + AI completion  
 - Enforces team conventions (prefix, length, type)  
 - Configurable via **Settings → Tools → Commit Helper**  
@@ -25,11 +28,13 @@ Generate clear, consistent commit messages with one click — following your tea
 
 ## 🚀 Usage
 1. Open **Settings → Tools → Commit Helper** and configure:
-   - AI provider (Gemini, Mistral)
+   - AI provider (Gemini, Mistral, or Ollama for local models)
    - API key / endpoint  
-   - Language, max length, and template  
-2. In the Commit window, click **Commit Helper**  
-3. Review, edit, and commit as usual  
+   - Language (English, Turkish, Spanish, German, French, Italian, Portuguese, Russian, Chinese, Japanese, Korean)
+   - Max length and template  
+2. In the Commit window, select the files you want to commit.
+3. Click **Commit Helper**  
+4. Review, edit, and commit as usual  
 
 ---
 
@@ -41,7 +46,7 @@ Generate clear, consistent commit messages with one click — following your tea
 **Rules:**
 - Subject ≤ 72 characters  
 - Types: feat, fix, docs, refactor, perf, test, chore  
-- Language selectable (English, Turkish)  
+- Language selectable (11 options)  
 
 ---
 

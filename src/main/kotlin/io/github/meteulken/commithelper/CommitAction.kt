@@ -13,6 +13,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.ui.CommitMessage
 import io.github.meteulken.commithelper.provider.GeminiSpec
 import io.github.meteulken.commithelper.provider.MistralSpec
+import io.github.meteulken.commithelper.provider.OllamaLocalSpec
 
 private const val MAX_DIFF_CHARS = 6_000
 
@@ -25,8 +26,12 @@ class CommitAction : AnAction(), DumbAware {
         val settings = CommitPluginSettings.getInstance()
         val providerName = settings.provider
         val branch = BranchUtil.getCurrentBranch(project) ?: "no-branch"
+        val checkinPanel = e.getData(com.intellij.openapi.vcs.ui.Refreshable.PANEL_KEY) as? com.intellij.openapi.vcs.CheckinProjectPanel
+        val changes = checkinPanel?.selectedChanges?.toList()
+            ?: e.getData(com.intellij.openapi.vcs.VcsDataKeys.CHANGES)?.toList()
+            ?: emptyList()
 
-        val rawDiff = DiffUtil.collectSelectedDiffs(project)
+        val rawDiff = DiffUtil.collectSelectedDiffs(project, changes)
 
         val diff = rawDiff.takeIf { it.isNotBlank() }?.let {
             if (it.length <= MAX_DIFF_CHARS) it else it.take(MAX_DIFF_CHARS) + "\n[...diff truncated...]"
@@ -39,6 +44,7 @@ class CommitAction : AnAction(), DumbAware {
                 val (providerSpec, apiKey) = when (providerName) {
                     "Gemini"  -> GeminiSpec to KeyStorage.loadGemini()
                     "Mistral" -> MistralSpec to KeyStorage.loadMistral()
+                    "Ollama (Local)" -> OllamaLocalSpec to "LOCAL"
                     else      -> null to ""
                 }
 
@@ -52,6 +58,7 @@ class CommitAction : AnAction(), DumbAware {
                 }
 
                 if (diff.isBlank()) {
+                    notify(project, "Could not generate diff from selected files. Please ensure files are selected and versioned.")
                     val fallbackSubject =
                         if (settings.commitStyle.equals("conventional", true)) "chore: update files"
                         else "Update files"
